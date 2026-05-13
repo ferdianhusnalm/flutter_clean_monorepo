@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- apps/main_app/android/app/src/prod/res/values/strings.xml -->
+<resources>
+    <string name="app_name">App</string>
+</resources>
+ 

@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Setup ────────────────────────────────────────────────────────────────────
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap Melos
+        run: melos bootstrap
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.yaml') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+  # ─── Analyze ─────────────────────────────────────────────────────────────────
+  analyze:
+    name: Analyze
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos run analyze
+
+  # ─── Test ─────────────────────────────────────────────────────────────────────
+  test:
+    name: Test
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - run: melos run test
+
+  # ─── Build Android (dev) ──────────────────────────────────────────────────────
+  build-android-dev:
+    name: Build Android DEV
+    needs: [analyze, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - name: Build APK (dev)
+        run: melos run build:android:dev
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-dev-apk
+          path: apps/main_app/build/app/outputs/flutter-apk/app-dev-release.apk
+
+  # ─── Build Android (prod) ────────────────────────────────────────────────────
+  build-android-prod:
+    name: Build Android PROD
+    needs: [analyze, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    env:
+      KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - name: Build APK (prod)
+        run: melos run build:android:prod
+
+  # ─── Build iOS (dev) ─────────────────────────────────────────────────────────
+  build-ios-dev:
+    name: Build iOS DEV
+    needs: [analyze, test]
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.22.0"
+          channel: stable
+          cache: true
+      - run: dart pub global activate melos
+      - run: melos bootstrap
+      - name: Build iOS (dev) — no codesign
+        run: |
+          cd apps/main_app
+          flutter build ios \
+            --flavor dev \
+            --target lib/main_dev.dart \
+            --no-codesign

@@ -1,0 +1,8 @@
+name: flutter_boilerplate_workspace
+description: Mono-repo workspace root (not a Flutter package itself)
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dev_dependencies:
+  melos: ^6.1.0

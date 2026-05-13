@@ -1,0 +1,7 @@
+# apps/main_app/ios/Flutter/flavors/prod.xcconfig
+#include "Generated.xcconfig"
+
+FLUTTER_TARGET=lib/main_prod.dart
+BUNDLE_ID_SUFFIX=
+APP_NAME=App
+API_BASE_URL=https://api.example.com

@@ -1,0 +1,80 @@
+name: flutter_clean_monorepo
+
+packages:
+  - apps/**
+  - packages/**
+
+sdkPath: auto
+
+scripts:
+  # --- Code generation ---
+  gen:
+    run: melos exec --depends-on="build_runner" -- dart run build_runner build --delete-conflicting-outputs
+    description: Run build_runner in all packages that use it
+
+  gen:watch:
+    run: melos exec --depends-on="build_runner" -- dart run build_runner watch --delete-conflicting-outputs
+    description: Watch mode for code generation
+
+  # --- Analysis ---
+  analyze:
+    run: melos exec -- flutter analyze
+    description: Analyze all packages
+
+  # --- Tests ---
+  test:
+    run: melos exec --fail-fast -- flutter test
+    description: Run tests in all packages
+
+  test:coverage:
+    run: melos exec -- flutter test --coverage
+    description: Run tests with coverage
+
+  # --- Formatting ---
+  format:
+    run: melos exec -- dart format . --fix
+    description: Format all packages
+
+  # --- Flutter ---
+  clean:
+    run: melos exec -- flutter clean
+    description: Flutter clean all packages
+
+  get:
+    run: melos exec -- flutter pub get
+    description: Flutter pub get all packages
+
+  # --- Flavor-specific run commands ---
+  run:dev:
+    run: cd apps/main_app && flutter run --flavor dev --target lib/main_dev.dart
+    description: Run app in dev flavor
+
+  run:staging:
+    run: cd apps/main_app && flutter run --flavor staging --target lib/main_staging.dart
+    description: Run app in staging flavor
+
+  run:prod:
+    run: cd apps/main_app && flutter run --flavor prod --target lib/main_prod.dart
+    description: Run app in production flavor
+
+  # --- Build commands ---
+  build:android:dev:
+    run: cd apps/main_app && flutter build apk --flavor dev --target lib/main_dev.dart
+    description: Build Android APK (dev)
+
+  build:android:prod:
+    run: cd apps/main_app && flutter build apk --flavor prod --target lib/main_prod.dart
+    description: Build Android APK (prod)
+
+  build:ios:dev:
+    run: cd apps/main_app && flutter build ios --flavor dev --target lib/main_dev.dart
+    description: Build iOS (dev)
+
+  build:ios:prod:
+    run: cd apps/main_app && flutter build ios --flavor prod --target lib/main_prod.dart
+    description: Build iOS (prod)
+
+  # --- Lint ---
+  lint:
+    run: melos exec -- dart analyze --fatal-infos
+    description: Strict lint all packages

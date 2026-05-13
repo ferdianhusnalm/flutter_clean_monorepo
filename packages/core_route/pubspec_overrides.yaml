@@ -1,0 +1,14 @@
+# melos_managed_dependency_overrides: core_network,core_storage,core_ui,feature_auth,feature_home,shared_models
+dependency_overrides:
+  core_network:
+    path: ../core_network
+  core_storage:
+    path: ../core_storage
+  core_ui:
+    path: ../core_ui
+  feature_auth:
+    path: ../feature_auth
+  feature_home:
+    path: ../feature_home
+  shared_models:
+    path: ../shared_models

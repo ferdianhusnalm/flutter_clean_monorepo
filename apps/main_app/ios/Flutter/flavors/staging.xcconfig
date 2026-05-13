@@ -1,0 +1,7 @@
+# apps/main_app/ios/Flutter/flavors/staging.xcconfig
+#include "Generated.xcconfig"
+
+FLUTTER_TARGET=lib/main_staging.dart
+BUNDLE_ID_SUFFIX=.staging
+APP_NAME=App [STG]
+API_BASE_URL=https://api-staging.example.com
