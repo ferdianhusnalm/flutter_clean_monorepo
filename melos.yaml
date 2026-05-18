@@ -74,6 +74,14 @@ scripts:
     run: cd apps/main_app && flutter build ios --flavor prod --target lib/main_prod.dart
     description: Build iOS (prod)
 
+  bundle:android:prod:
+    run: cd apps/main_app && flutter build appbundle --flavor prod --target lib/main_prod.dart
+    description: Build Android App Bundle (prod)
+
+  bundle:ios:prod:
+    run: cd apps/main_app && flutter build ios --flavor prod --target lib/main_prod.dart --release
+    description: Build iOS App Bundle (prod)
+
   # --- Lint ---
   lint:
     run: melos exec -- dart analyze --fatal-infos

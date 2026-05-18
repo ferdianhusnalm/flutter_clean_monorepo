@@ -9,6 +9,7 @@ import 'dart:async' as _i687;
 import 'package:core_network/core_network.dart' as _i309;
 import 'package:core_storage/core_storage.dart' as _i78;
 import 'package:dio/dio.dart' as _i361;
+import 'package:feature_auth/src/core/route/auth_router.dart' as _i1020;
 import 'package:feature_auth/src/data/datasources/auth_remote_datasource.dart'
     as _i337;
 import 'package:feature_auth/src/data/respositories/auth_repository_impl.dart'
@@ -27,6 +28,7 @@ class FeatureAuthPackageModule extends _i526.MicroPackageModule {
 // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
+    gh.singleton<_i1020.AuthRouter>(() => _i1020.AuthRouter());
     gh.singleton<_i337.AuthRemoteDataSource>(
         () => _i337.AuthRemoteDataSourceImpl(gh<_i361.Dio>()));
     gh.singleton<_i1063.AuthRepository>(() => _i878.AuthRepositoryImpl(
